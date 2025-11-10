@@ -1,0 +1,272 @@
+\documentclass[a4paper,12pt]{article}
+
+% Підтримка української мови
+\usepackage[utf8]{inputenc}
+\usepackage[ukrainian]{babel}
+
+% Основні пакети для форматування
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{indentfirst}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{titlesec}
+\usepackage{setspace}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{listings}
+
+% Поля сторінки
+\geometry{left=25mm,right=15mm,top=20mm,bottom=20mm}
+\setstretch{1.2}
+
+% Заголовки
+\titleformat{\section}{\normalfont\bfseries\large}{\thesection.}{1em}{}
+\titleformat{\subsection}{\normalfont\bfseries\normalsize}{\thesubsection.}{1em}{}
+
+% Оформлення колонтитулів
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Лабораторна робота №1}
+\fancyfoot[C]{\thepage}
+
+% --- Налаштування listings для C# ---
+\lstdefinestyle{CSharp}{
+	language=[Sharp]C,
+	basicstyle=\ttfamily\small,
+	keywordstyle=\color{blue}\bfseries,
+	stringstyle=\color{brown},
+	commentstyle=\color{gray},
+	numbers=left,
+	numberstyle=\tiny,
+	stepnumber=1,
+	numbersep=8pt,
+	backgroundcolor=\color{gray!5},
+	frame=single,
+	tabsize=4,
+	breaklines=true,
+	breakatwhitespace=false,
+	showstringspaces=false,
+	captionpos=b
+}
+
+\begin{document}
+	
+	% --- Титульна сторінка ---
+	\begin{titlepage}
+		\centering
+		\vspace*{3cm}
+		
+		{\LARGE \textbf{Лабораторна робота №1, етап 2}}\\[0.5cm]
+		{\Large з дисципліни}\\[0.3cm]
+		{\Large \textbf{«Інформаційні технології»}}\\[3cm]
+		
+		{\large Виконав:}\\[0.3cm]
+		{\Large \textbf{Гончар Михайло, група ТК-41}}\\[2cm]
+		
+		{\Large \textbf{Київський нацiональний унiверситет iменi Тараса Шевченка}}\\[0.5cm]
+		{\Large \textbf{Факультет комп’ютерних наук i кiбернетики}}\\[3cm]
+		
+		{\large Дата виконання:}\\[0.3cm]
+		{\Large \textbf{03 жовтня 2025 р.}}
+		
+		\vfill
+	\end{titlepage}
+	
+	% --- Початок нумерації сторінок ---
+	\setcounter{page}{1}
+	\pagenumbering{arabic}
+	\newpage
+	
+	\section*{Мета роботи}
+	Ознайомитися з принципами побудови систем управління табличними базами даних, створити частково реалізовану програмну систему для роботи з базами даних, таблицями та полями, реалізувати функції додавання, редагування, видалення, збереження та порівняння таблиць.
+	
+	\section*{Завдання варіанту}
+	\begin{itemize}
+		\item Підтримати типи даних: ціле, дійсне, символ, рядок, комплексне ціле, комплексне дійсне.
+		\item Реалізувати функцію \textbf{різниця таблиць} — порівняння значень між двома таблицями за вибраними полями.
+	\end{itemize}
+	
+	\section*{Хід виконання роботи}
+	
+	\subsection*{1. Розробка структури бази даних}
+	Було створено базу даних із такими основними сутностями:
+	\begin{itemize}
+		\item \textbf{Dbase} — база даних;
+		\item \textbf{Table} — таблиця;
+		\item \textbf{Field} — поле таблиці;
+		\item \textbf{Row} — рядок;
+		\item \textbf{Value} — значення;
+		\item \textbf{Type} — тип даних поля.
+	\end{itemize}
+	
+	Всі зв’язки між таблицями реалізовано через ORM Entity Framework.
+	
+	\subsection*{2. Інтерфейс користувача}
+	Графічний інтерфейс створено на базі \textbf{Windows Forms}.  
+	Користувач має змогу:
+	\begin{itemize}
+		\item створювати нову базу даних;
+		\item створювати таблиці в межах бази;
+		\item додавати поля;
+		\item додавати рядки та редагувати значення;
+		\item видаляти бази, таблиці, поля, рядки;
+		\item зберігати всі бази даних у JSON-файл;
+		\item завантажувати дані з JSON-файлу;
+		\item порівнювати дві таблиці (функція <<Різниця таблиць>>).
+	\end{itemize}
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.9\textwidth]{../screenshots/desktop_dbs.png}
+		\caption{Головне вікно програми з переліком баз даних}
+	\end{figure}
+	
+	\subsection*{3. Реалізація функціональності}
+	
+	\subsubsection*{3.1. Створення та видалення об’єктів}
+	У коді реалізовано керування станами:
+	\begin{itemize}
+		\item 0 — робота з базами;
+		\item 1 — робота з таблицями;
+		\item 2 — робота з полями та рядками.
+	\end{itemize}
+	
+	\subsubsection*{3.2. Валідація введених значень}
+	Для перевірки введених користувачем значень реалізовано метод:
+	\begin{verbatim}
+		public bool ValidateValue(string val, int typeId)
+	\end{verbatim}
+	
+	Перевірка комплексних типів:
+	\begin{verbatim}
+		case 5: return Regex.IsMatch(val, @"^[+-]?\d+([+-]\d+)i$"); // комплексне ціле
+		case 6: return Regex.IsMatch(val, @"^[+-]?(\d+(\.\d+)?)([+-](\d+(\.\d+)?))i$");
+	\end{verbatim}
+	
+	\subsubsection*{3.3. Збереження та завантаження баз даних}
+	Кнопки \textbf{Save} і \textbf{Load} реалізують експорт та імпорт у форматі JSON:
+	\begin{verbatim}
+		File.WriteAllText("backup.json", json);
+		File.ReadAllText("backup.json");
+	\end{verbatim}
+	
+	\subsubsection*{3.4. Порівняння таблиць (різниця таблиць)}
+	Функція викликається кнопкою \textbf{“Diff”}.  
+	Відкривається нове вікно, де користувач обирає поле з поточної таблиці, іншу таблицю та поле для порівняння. Програма відображає обидві таблиці поруч і виконує аналіз значень.
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.9\textwidth]{../screenshots/desktop_diff.png}
+		\caption{Вікно “Table Difference” з двома таблицями для порівняння}
+	\end{figure}
+	
+	\subsection*{4. Особливості реалізації}
+	\begin{itemize}
+		\item ORM: \textbf{Entity Framework Core};
+		\item Формат резервного копіювання: \textbf{JSON (Newtonsoft.Json)};
+		\item Інтерфейс: \textbf{Windows Forms (C\#)};
+		\item Повна підтримка CRUD-операцій.
+	\end{itemize}
+	
+	
+	\section*{5. Тестування програми (Unit-тести)}
+	
+	Для перевірки коректності роботи функцій було створено набір модульних тестів із використанням бібліотеки \textbf{xUnit}. Тестування охоплює:
+	\begin{itemize}
+		\item перевірку валідності введених значень;
+		\item додавання нових рядків і створення пов’язаних значень;
+		\item пошук відмінностей між таблицями.
+	\end{itemize}
+	
+	\subsection*{5.1. Тести валідації}
+	Мета тесту — переконатися, що метод \texttt{ValidateValue} коректно обробляє різні типи даних.
+	
+	\begin{lstlisting}[style=CSharp,caption={ValidationTests}]
+		[Theory]
+		[InlineData("123", 1, true)]   // int
+		[InlineData("abc", 1, false)]  // int
+		[InlineData("12.5", 2, true)]  // double
+		[InlineData("x", 3, true)]     // char
+		[InlineData("xyz", 3, false)]  // char
+		public void TestValidateValue(string val, int typeId, bool expected)
+		{
+			var form = new skbd.Form1();
+			var result = form.ValidateValue(val, typeId);
+			Assert.Equal(expected, result);
+		}
+	\end{lstlisting}
+	
+	\subsection*{5.2. Тести для сервісу рядків}
+	\begin{lstlisting}[style=CSharp,caption={RowServiceTests}]
+		[Fact]
+		public void AddNewRow_ShouldCreateRowAndValues()
+		{
+			using var context = GetInMemoryContext();
+			
+			var table = new Table { Name = "TestTable" };
+			context.Tables.Add(table);
+			context.SaveChanges();
+			
+			context.Fields.Add(new Field { TableId = table.Id, Name = "Field1" });
+			context.Fields.Add(new Field { TableId = table.Id, Name = "Field2" });
+			context.SaveChanges();
+			
+			var service = new RowService(context);
+			var row = service.AddNewRow(table.Id);
+			
+			Assert.NotNull(row);
+			Assert.True(row.Id > 0);
+			
+			var values = context.Values.Where(v => v.RowId == row.Id).ToList();
+			Assert.Equal(2, values.Count);
+			Assert.All(values, v => Assert.Equal("", v.Val));
+		}
+	\end{lstlisting}
+	
+	\subsection*{5.3. Тести для порівняння таблиць}
+	\begin{lstlisting}[style=CSharp,caption={TableDiffServiceTests}]
+		[Fact]
+		public void GetDifferentRows_ShouldReturnRowsWithoutMatches()
+		{
+			using var context = GetInMemoryContext();
+			var service = new TableDiffService(context);
+			
+			var diff = service.GetDifferentRows(1, "Col1", 2, "ColX");
+			
+			Assert.Single(diff);         
+			Assert.Equal(2, diff[0].Id);  
+		}
+	\end{lstlisting}
+	
+	\subsection*{5.4. Результати тестів}
+	Усі тести були виконані успішно. Це підтверджує, що всі основні модулі системи працюють коректно.
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.8\textwidth]{../screenshots/desktop_test.png}
+		\caption{Результати проходження unit-тестів у xUnit}
+	\end{figure}
+	
+	\section*{Результати роботи}
+	\begin{itemize}
+		\item Створено функціональну систему управління табличними базами даних;
+		\item Реалізовано підтримку комплексних типів;
+		\item Реалізовано операцію різниці таблиць;
+		\item Додано збереження/відновлення у форматі JSON;
+		\item Забезпечено зручний графічний інтерфейс.
+	\end{itemize}
+	
+	\section*{Висновки}
+	У ході виконання лабораторної роботи:
+	\begin{itemize}
+		\item засвоєно принципи побудови систем управління табличними базами даних;
+		\item реалізовано програмну систему з використанням ORM Entity Framework;
+		\item додано підтримку комплексних чисел;
+		\item створено інструмент для порівняння таблиць;
+		\item отримано практичні навички роботи з C\#, WinForms, EF, JSON.
+	\end{itemize}
+	
+\end{document}

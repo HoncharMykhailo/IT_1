@@ -1,0 +1,106 @@
+[
+  {
+    "Name": "db1",
+    "Tables": [
+      {
+        "Name": "t11",
+        "Fields": [
+          {
+            "Name": "f111",
+            "TypeId": 5,
+            "Values": [
+              {
+                "RowId": 1,
+                "Val": "1+1i                                              "
+              },
+              {
+                "RowId": 2,
+                "Val": "4+56i                                             "
+              }
+            ]
+          },
+          {
+            "Name": "f115",
+            "TypeId": 6,
+            "Values": [
+              {
+                "RowId": 1,
+                "Val": "1.5+6i                                            "
+              },
+              {
+                "RowId": 2,
+                "Val": "1.3-8.1i                                          "
+              }
+            ]
+          },
+          {
+            "Name": "f116",
+            "TypeId": 2,
+            "Values": [
+              {
+                "RowId": 1,
+                "Val": "5675                                              "
+              },
+              {
+                "RowId": 2,
+                "Val": "454.564                                           "
+              }
+            ]
+          },
+          {
+            "Name": "f117",
+            "TypeId": 4,
+            "Values": [
+              {
+                "RowId": 1,
+                "Val": "gfg                                               "
+              },
+              {
+                "RowId": 2,
+                "Val": "fghfgjhghk                                        "
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "Name": "t12",
+        "Fields": [
+          {
+            "Name": "int",
+            "TypeId": 1,
+            "Values": [
+              {
+                "RowId": 4,
+                "Val": "                             5                    "
+              }
+            ]
+          },
+          {
+            "Name": "double",
+            "TypeId": 2,
+            "Values": [
+              {
+                "RowId": 4,
+                "Val": "235658.988543                                     "
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Name": "db2",
+    "Tables": [
+      {
+        "Name": "r21",
+        "Fields": []
+      },
+      {
+        "Name": "t22",
+        "Fields": []
+      }
+    ]
+  }
+]
