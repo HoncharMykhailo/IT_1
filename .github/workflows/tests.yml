@@ -1,4 +1,4 @@
-name: CI - Build & Test
+name: CI - Run Tests on All OS
 
 on:
   push:
@@ -7,30 +7,11 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-windows:
-    name: Build Main Project (Windows only)
-    runs-on: windows-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0.x
-
-      - name: Restore dependencies
-        run: dotnet restore ./skbd/skbd.sln
-
-      - name: Build main project
-        run: dotnet build ./skbd/skbd.sln --configuration Release --no-restore
-
   run-tests:
-    name: Run Tests on All OS
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [windows-latest, ubuntu-latest, macos-latest]
 
     steps:
       - name: Checkout repository
@@ -41,6 +22,16 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Restore dependencies and run tests
-        run: dotnet test ./skbd.Tests/skbd.Tests.csproj -p:EnableWindowsTargeting=true --verbosity normal
+      - name: Build and test on Windows
+        if: runner.os == 'Windows'
+        run: |
+          echo "Running on Windows: build main project"
+          dotnet restore ./skbd/skbd.sln
+          dotnet build ./skbd/skbd.sln --configuration Release --no-restore
+          dotnet test ./skbd.Tests/skbd.Tests.csproj --verbosity normal
 
+      - name: Test only on Linux/macOS
+        if: runner.os != 'Windows'
+        run: |
+          echo "Running on Linux/macOS: skip Windows-only project"
+          dotnet test ./skbd.Tests/skbd.Tests.csproj --verbosity normal
