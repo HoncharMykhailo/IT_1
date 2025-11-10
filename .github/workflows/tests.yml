@@ -8,7 +8,6 @@ on:
 
 jobs:
   build-and-test:
-    name: Run tests on OS matrix
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -21,13 +20,15 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 9.0.x  
+          dotnet-version: 9.0.x   # або інша версія, яку ти використовуєш
 
-      - name: Restore dependencies
-        run: dotnet restore ./skbd.sln
+      - name: Restore dependencies (main project)
+        run: dotnet restore ./skbd/skbd.sln
 
-      - name: Build project
-        run: dotnet build ./skbd.sln --configuration Release --no-restore
+      - name: Build main project
+        run: dotnet build ./skbd/skbd.sln --configuration Release --no-restore
 
       - name: Run tests
-        run: dotnet test ./skbd.Tests/skbd.Tests.csproj --no-build --verbosity normal
+        run: |
+          dotnet restore ./skbd.Tests/skbd.Tests.sln
+          dotnet test ./skbd.Tests/skbd.Tests.sln --configuration Release --no-build --verbosity normal
