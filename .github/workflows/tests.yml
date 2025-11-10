@@ -42,4 +42,5 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Restore dependencies and run tests
-        run: dotnet test ./skbd.Tests/skbd.Tests.csproj --verbosity normal
+        dotnet test ./skbd.Tests/skbd.Tests.csproj -p:EnableWindowsTargeting=true --verbosity normal
+
