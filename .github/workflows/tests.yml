@@ -1,4 +1,4 @@
-name: CI - Run Tests on All OS
+name: CI - Build & Test
 
 on:
   push:
@@ -11,12 +11,19 @@ jobs:
     name: Build Main Project (Windows only)
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
-      - run: dotnet restore ./skbd/skbd.sln
-      - run: dotnet build ./skbd/skbd.sln --configuration Release --no-restore
+
+      - name: Restore dependencies
+        run: dotnet restore ./skbd/skbd.sln
+
+      - name: Build main project
+        run: dotnet build ./skbd/skbd.sln --configuration Release --no-restore
 
   run-tests:
     name: Run Tests on All OS
@@ -26,9 +33,13 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
-      - run: dotnet restore ./skbd.Tests/skbd.Tests.sln
-      - run: dotnet test ./skbd.Tests/skbd.Tests.sln --configuration Release --no-build --verbosity normal
+
+      - name: Restore dependencies and run tests
+        run: dotnet test ./skbd.Tests/skbd.Tests.csproj --verbosity normal
