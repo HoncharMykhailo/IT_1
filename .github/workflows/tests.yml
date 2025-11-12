@@ -1,6 +1,5 @@
 name: .NET Unit Tests
 
-# Trigger workflow on push and pull request
 on:
   push:
     branches:
@@ -20,24 +19,19 @@ jobs:
       fail-fast: false
 
     steps:
-    # 1. Checkout the repo
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    # 2. Setup .NET
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '9.0.x' # adjust to your .NET version
+        dotnet-version: '9.0.x' 
 
-    # 3. Restore dependencies
     - name: Restore dependencies
       run: dotnet restore ./skbd/skbd.sln
 
-    # 4. Build the solution
     - name: Build solution
       run: dotnet build ./skbd/skbd.sln --no-restore --configuration Release
 
-    # 5. Run tests
     - name: Run unit tests
       run: dotnet test ./skbd.Tests/skbd.Tests.csproj --no-build --verbosity normal
